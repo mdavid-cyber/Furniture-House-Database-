@@ -1,0 +1,140 @@
+CREATE TABLE BRANCH (
+BranchID VARCHAR2(6) PRIMARY KEY,
+Address VARCHAR2(100) NOT NULL,
+Telephone VARCHAR2(12) NOT NULL,
+Email VARCHAR2(50) NOT NULL
+);
+
+CREATE TABLE MEMBER (
+MemberID VARCHAR2(8) PRIMARY KEY,
+FirstName VARCHAR2(20) NOT NULL,
+LastName VARCHAR2(20) NOT NULL,
+EmailAddress VARCHAR2(50) NOT NULL,
+PhoneNumber VARCHAR2(20) NOT NULL,
+Address VARCHAR2(100) NOT NULL,
+JoinDate DATE NOT NULL,
+BranchID VARCHAR2(6) NOT NULL,
+FOREIGN KEY (BranchID) REFERENCES Branch(BranchID)
+);
+
+CREATE TABLE Staff (
+StaffID VARCHAR2(7) PRIMARY KEY,
+FirstName VARCHAR2(20) NOT NULL,
+LastName VARCHAR2(20) NOT NULL,
+EmailAddress VARCHAR2(50) NOT NULL,
+PhoneNumber VARCHAR2(20) NOT NULL,
+JobPosition VARCHAR2(20) NOT NULL,
+Salary Number(10) CONSTRAINT check_salary CHECK (Salary > 0),
+BranchID VARCHAR2(6) NOT NULL,
+ManagerID VARCHAR2(7),
+FOREIGN KEY (ManagerID) REFERENCES Staff(StaffID),
+FOREIGN KEY (BranchID) REFERENCES Branch(BranchID)
+);
+
+CREATE TABLE Furniture (
+FurnitureID VARCHAR2(8) PRIMARY KEY,
+StockNumber VARCHAR2(8) NOT NULL,
+ItemTitle VARCHAR2(50) NOT NULL,
+Colour VARCHAR2(8),
+ItemSize VARCHAR2(10) CONSTRAINT check_itemsize CHECK (ItemSize IN ('KingSize', 'Small', 'Medium', 'Large')),
+Price NUMBER(8) CHECK (Price > 0),
+BranchID VARCHAR2(6) NOT NULL,
+FOREIGN KEY (BranchID) REFERENCES Branch(BranchID)
+);
+
+CREATE TABLE Rental (
+RentalID VARCHAR2(7) PRIMARY KEY,
+DateOut DATE NOT NULL,
+DateIn DATE NOT NULL,
+TotalCost NUMBER(20) CONSTRAINT check_totalcost CHECK (TotalCost > 0),
+MemberID VARCHAR2(8) NOT NULL,
+FurnitureID VARCHAR2(8) NOT NULL,
+FOREIGN KEY (MemberID) REFERENCES Member(MemberID),
+FOREIGN KEY (FurnitureID) REFERENCES Furniture(FurnitureID)
+);
+COMMIT;
+
+
+
+INSERT INTO Branch (BranchID, Address, Telephone, Email)
+VALUES ('B010', '16, Castle St Eccleshall Stafford, Staffordshire, ST21 6DF', '01785850166', 'stafford@furniturehouse.com');
+
+
+INSERT INTO MEMBER (MemberID, FirstName, LastName, EmailAddress, PhoneNumber, Address, JoinDate, BranchID)
+VALUES ('M12345', 'John', 'Green', 'johngreen@gmail.com',  '07080804090', '16 Brockley Sq, Hanley, ST1 5LY', TO_DATE('12-12-2006', 'DD-MM-YYYY'), 'B010');
+
+INSERT INTO MEMBER (MemberID, FirstName, LastName, EmailAddress, PhoneNumber, Address, JoinDate, BranchID)
+VALUES ('M14234', 'Peter', 'Brown', 'peterbrown@gmail.com', '07770070084', '127 Pea Lane, Hanley, ST1 4JH', TO_DATE('13-12-2006', 'DD-MM-YYYY'), 'B010');
+
+INSERT INTO MEMBER (MemberID, FirstName, LastName, EmailAddress, PhoneNumber, Address, JoinDate, BranchID)
+VALUES ('M12432', 'Ron', 'Davis', 'rondavis@gmail.com', '07865432111', '83 York Street, Hanley, ST1 5ET', TO_DATE('13-12-2006', 'DD-MM-YYYY'), 'B010');
+
+
+INSERT INTO STAFF (StaffID, FirstName, LastName, EmailAddress, PhoneNumber, JobPosition, Salary, BranchID)
+VALUES ('S0090', 'John', 'Green', 'johngreen@furniturehouse.com', '07123456789', 'Manager', 45000, 'B010'); 
+
+INSERT INTO STAFF (StaffID, FirstName, LastName, EmailAddress, PhoneNumber, JobPosition, Salary, ManagerID, BranchID)
+VALUES ('S0110', 'Cal', 'Jones', 'caljones@furniturehouse.com', '07234567890', 'Administrator', 40000, 'S0090', 'B010'); 
+
+INSERT INTO STAFF (StaffID, FirstName, LastName, EmailAddress, PhoneNumber, JobPosition, Salary, ManagerID, BranchID)
+VALUES ('S0120', 'Clare', 'Smith', 'claresmith@furniturehouse.com', '07345678901', 'Administrator', 40000, 'S0090', 'B010'); 
+
+INSERT INTO STAFF (StaffID, FirstName, LastName, EmailAddress, PhoneNumber, JobPosition, Salary, ManagerID, BranchID)
+VALUES ('S1060', 'Chris', 'Logan', 'chrislogan@furniturehouse.com', '07456789012', 'Assistant', 23000, 'S0090', 'B010'); 
+
+INSERT INTO STAFF (StaffID, FirstName, LastName, EmailAddress, PhoneNumber, JobPosition, Salary, ManagerID, BranchID)
+VALUES ('S1070', 'Anne', 'Walters', 'annewalters@furniturehouse.com', '07456789012', 'Assistant', 23000, 'S0090', 'B010'); 
+
+INSERT INTO STAFF (StaffID, FirstName, LastName, EmailAddress, PhoneNumber, JobPosition, Salary, ManagerID, BranchID)
+VALUES ('S1080', 'Jan', 'Round', 'janround@furniturehouse.com', '07456789012', 'Assistant', 23000, 'S0090', 'B010'); 
+
+
+INSERT INTO FURNITURE (FurnitureID, StockNumber, ItemTitle, Colour, ItemSize, Price, BranchID) 
+VALUES ('F1', '18828', 'Ikea malm bed', 'Brown', 'KingSize', 40, 'B010');
+
+INSERT INTO FURNITURE (FurnitureID, StockNumber, ItemTitle, Colour, ItemSize, Price, BranchID)
+VALUES ('F2', '16253', 'Habitat Kristopher Bed', 'Grey', 'Small', 30, 'B010');
+
+
+INSERT INTO Rental (RentalID, DateOut, DateIn, TotalCost, MemberID, FurnitureID)
+VALUES ('R10', TO_DATE('16-07-2022', 'DD-MM-YYYY'), TO_DATE('18-12-2022', 'DD-MM-YYYY'), 240, 'M12345', 'F1');
+
+
+INSERT INTO Rental (RentalID, DateOut, DateIn, TotalCost, MemberID, FurnitureID)
+VALUES ('R11', TO_DATE('19-07-2022', 'DD-MM-YYYY'), TO_DATE('20-01-2023', 'DD-MM-YYYY'), 210, 'M14234', 'F2');
+COMMIT;
+
+
+
+CREATE SEQUENCE furniture_seq
+START WITH 3 
+INCREMENT BY 1 
+NOCACHE;
+
+CREATE SEQUENCE rental_seq
+START WITH 12
+INCREMENT BY 1
+NOCACHE;
+
+INSERT INTO FURNITURE (FurnitureID, StockNumber, ItemTitle, Colour, ItemSize, Price, BranchID) 
+VALUES ('F' || furniture_seq.NEXTVAL, '17548', 'Coffee desk', 'White', 'Medium', 25, 'B010');
+
+
+INSERT INTO Rental (RentalID, DateOut, DateIn, TotalCost, MemberID, FurnitureID)
+VALUES ('R' || rental_seq.NEXTVAL, TO_DATE('11-01-2023', 'DD-MM-YYYY'), TO_DATE('15-12-2023', 'DD-MM-YYYY'), 220, 'M12432', 'F3');
+
+
+
+
+Rank command gives position
+
+Decode means if this value appears it can also be displayed as this 
+
+
+
+
+
+
+
+
+
